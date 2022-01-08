@@ -8,3 +8,20 @@ class Product(db.Model):
     name = db.Column(db.String(200), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
+
+    def check_available_quantity(self):
+        status_dict = {}
+        if self.quantity <= 0:
+            status_dict["status"] = "not_available"
+            status_dict["available_quantity"] = self.quantity
+
+            return status_dict
+
+        status_dict["status"] = "available"
+        status_dict["available_quantity"] = self.quantity
+
+        return status_dict
+
+    def check_ordered_quantity(self, ordered_quantity):
+        if ordered_quantity > self.quantity:
+            return True
