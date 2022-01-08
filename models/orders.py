@@ -18,6 +18,7 @@ class OrderDetail(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+    price = db.Column(db.Float)
     quantity = db.Column(db.Integer)
     created_date = db.Column(db.TIMESTAMP, default=datetime.now())
     updated_date = db.Column(db.TIMESTAMP, default=datetime.now())

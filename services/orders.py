@@ -8,6 +8,39 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 class OrderServices(Responses):
+    def get_order_by_id(self, order_id):
+        order = Order.query.get(order_id)
+
+        # check order is exist or not
+        if not order:
+            self.set_status(404)
+            self.set_content("order not found")
+
+            return self.get_response()
+
+        # call function to get all order details
+        order_details = self.get_order_detail_order_id(order_id)
+        total_order_amount = 0.0
+
+        # calculate total order details amount
+        # only order with available quantity will be calculated
+        for detail in order_details:
+            if detail["product_status"]["status"] == "available":
+                total_order_amount += detail["amount"]
+
+        order_dict = {
+            "id": order.id,
+            "order_date": order.order_date.strftime("%m-%d-%Y %H:%M:%S"),
+            "status": order.status,
+            "total_amount": total_order_amount,
+            "order_details": order_details
+        }
+
+        self.set_status(200)
+        self.set_content(order_dict)
+
+        return self.get_response()
+
     def add_order(self, payload):
         products = payload["products"]
 
@@ -80,11 +113,35 @@ class OrderServices(Responses):
 
             return self.get_response()
 
+    def get_order_detail_order_id(self, order_id):
+        # function to get all order details
+        order_details = OrderDetail.query.filter_by(order_id=order_id).all()
+        order_details_list = []
+
+        if order_details:
+            for detail in order_details:
+                total_amount = detail.quantity * detail.price
+
+                # call function to check available quantity all products ordered
+                # status: available, not_available
+                status = check_product_available_quantity(detail.product_id)
+
+                order_details_list.append({
+                    "id": detail.id,
+                    "product_id": detail.product_id,
+                    "quantity": detail.quantity,
+                    "price": detail.price,
+                    "amount": total_amount,
+                    "product_status": status
+                })
+
+        return order_details_list
+
     def create_order_details(self, payload):
         # here is function to create the details
         # we can only call this function in this file
         order_detail = OrderDetail(order_id=payload["order_id"], quantity=payload["quantity"],
-                                   product_id=payload["product_id"])
+                                   product_id=payload["product_id"], price=payload["price"])
 
         db.session.add(order_detail)
         db.session.commit()
@@ -96,7 +153,11 @@ class OrderServices(Responses):
             "order_id": order_detail.order_id,
             "product_id": payload["product_id"],
             "quantity": order_detail.quantity,
+            "price": order_detail.price,
             "amount": total_amount
         }
 
         return order_detail_dict
+
+    def checkout_order(self, payload):
+        order = Order.query.get(payload["order_id"])
