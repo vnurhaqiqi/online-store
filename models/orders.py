@@ -11,6 +11,17 @@ class Order(db.Model):
     created_date = db.Column(db.TIMESTAMP)
     updated_date = db.Column(db.TIMESTAMP)
 
+    def total_amount(self):
+        # function to get all total amount from details
+        order_details = OrderDetail.query.filter_by(order_id=self.id).all()
+        total_amount = 0.0
+
+        for detail in order_details:
+            amount = detail.quantity * detail.price
+            total_amount += amount
+
+        return total_amount
+
 
 class OrderDetail(db.Model):
     __tablename__ = "order_details"

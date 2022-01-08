@@ -1,5 +1,4 @@
 from models.orders import Order, OrderDetail
-from models.products import Product
 from services.products import *
 from helpers.responses import Responses
 from app import db
