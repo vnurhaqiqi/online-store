@@ -59,27 +59,3 @@ class ProductServices(Responses):
             self.set_content(error)
 
             return self.get_response()
-
-
-def order_get_product_by_id(product_id):
-    product = Product.query.get(product_id)
-
-    return product
-
-
-def check_product_available_quantity(product_id):
-    product = Product.query.get(product_id)
-    status_dict = {}
-
-    # if quantity is equal 0
-    # then it will give not_available status
-    if product.quantity <= 0:
-        status_dict["status"] = "not_available"
-        status_dict["available_quantity"] = product.quantity
-
-        return status_dict
-
-    status_dict["status"] = "available"
-    status_dict["available_quantity"] = product.quantity
-
-    return status_dict

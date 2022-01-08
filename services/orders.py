@@ -1,4 +1,5 @@
 from models.orders import Order, OrderDetail
+from models.products import Product
 from services.products import *
 from helpers.responses import Responses
 from app import db
@@ -63,7 +64,7 @@ class OrderServices(Responses):
             # after check products in request
             # check product if it exists or not
             for p in products:
-                product = order_get_product_by_id(p["product_id"])
+                product = Product.query.get(p["product_id"])
 
                 # if the product is not exist
                 # it will give an error message and transaction cannot be continued
@@ -76,7 +77,7 @@ class OrderServices(Responses):
                 # check ordered quantity
                 # handle condition if the available quantity reduce before
                 # the order details created
-                if p["quantity"] > product.quantity:
+                if product.check_ordered_quantity(p["quantity"]):
                     self.set_status(400)
                     self.set_content("order quantity is greater than available quantity")
 
@@ -125,7 +126,8 @@ class OrderServices(Responses):
 
                 # call function to check available quantity all products ordered
                 # status: available, not_available
-                status = check_product_available_quantity(detail.product_id)
+                product = Product.query.get(detail.product_id)
+                status = product.check_available_quantity()
 
                 order_details_list.append({
                     "id": detail.id,
@@ -181,12 +183,12 @@ class OrderServices(Responses):
         # call function to get all order details
         order_details = self.get_order_detail_order_id(payload["order_id"])
         for detail in order_details:
-            product = order_get_product_by_id(detail["product_id"])
+            product = Product.query.get(detail["product_id"])
 
             # check product availability
             # prevent products out of stock
             # when the process running
-            product_status = check_product_available_quantity(detail["product_id"])
+            product_status = product.check_available_quantity()
             if product_status["status"] != "available":
                 self.set_status(400)
                 self.set_content("{name} is not available".format(name=product.name))
@@ -195,7 +197,7 @@ class OrderServices(Responses):
 
             # check ordered quantity
             # prevent the quantities is out of stock
-            if detail["quantity"] > product.quantity:
+            if product.check_ordered_quantity(detail["quantity"]):
                 self.set_status(400)
                 self.set_content("order quantity is greater than available quantity")
 
