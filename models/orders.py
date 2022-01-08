@@ -8,8 +8,8 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_date = db.Column(db.TIMESTAMP, default=datetime.now())
     status = db.Column(db.String(120), default="draft")
-    created_date = db.Column(db.TIMESTAMP, default=datetime.now())
-    updated_date = db.Column(db.TIMESTAMP, default=datetime.now())
+    created_date = db.Column(db.TIMESTAMP)
+    updated_date = db.Column(db.TIMESTAMP)
 
 
 class OrderDetail(db.Model):
@@ -20,5 +20,5 @@ class OrderDetail(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     price = db.Column(db.Float)
     quantity = db.Column(db.Integer)
-    created_date = db.Column(db.TIMESTAMP, default=datetime.now())
-    updated_date = db.Column(db.TIMESTAMP, default=datetime.now())
+    created_date = db.Column(db.TIMESTAMP)
+    updated_date = db.Column(db.TIMESTAMP)

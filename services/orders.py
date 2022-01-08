@@ -52,7 +52,8 @@ class OrderServices(Responses):
 
                 return self.get_response()
 
-            order = Order(order_date=datetime.now(), status="draft")
+            order = Order(order_date=datetime.now(), status="draft", created_date=datetime.now(),
+                          updated_date=datetime.now())
 
             db.session.add(order)
             db.session.commit()
@@ -141,7 +142,8 @@ class OrderServices(Responses):
         # here is function to create the details
         # we can only call this function in this file
         order_detail = OrderDetail(order_id=payload["order_id"], quantity=payload["quantity"],
-                                   product_id=payload["product_id"], price=payload["price"])
+                                   product_id=payload["product_id"], price=payload["price"],
+                                   created_date=datetime.now(), updated_date=datetime.now())
 
         db.session.add(order_detail)
         db.session.commit()
@@ -161,3 +163,58 @@ class OrderServices(Responses):
 
     def checkout_order(self, payload):
         order = Order.query.get(payload["order_id"])
+
+        # check order if exist or not
+        if not order:
+            self.set_status(404)
+            self.set_content("order not found")
+
+            self.get_response()
+
+        # check order status
+        if order.status != "draft":
+            self.set_status(400)
+            self.set_content("only order with draft status can be checked out")
+
+            return self.get_response()
+
+        # call function to get all order details
+        order_details = self.get_order_detail_order_id(payload["order_id"])
+        for detail in order_details:
+            product = order_get_product_by_id(detail["product_id"])
+
+            # check product availability
+            # prevent products out of stock
+            # when the process running
+            product_status = check_product_available_quantity(detail["product_id"])
+            if product_status["status"] != "available":
+                self.set_status(400)
+                self.set_content("{name} is not available".format(name=product.name))
+
+                return self.get_response()
+
+            # check ordered quantity
+            # prevent the quantities is out of stock
+            if detail["quantity"] > product.quantity:
+                self.set_status(400)
+                self.set_content("order quantity is greater than available quantity")
+
+                return self.get_response()
+
+            # available quantity minus ordered quantity
+            product.quantity = product.quantity - detail["quantity"]
+
+        order.status = "checkout"
+        order.updated_date = datetime.now()
+        db.session.commit()
+
+        order_dict = {
+            "id": order.id,
+            "status": order.status,
+            "message": "order has been checked out"
+        }
+
+        self.set_status(200)
+        self.set_content(order_dict)
+
+        return self.get_response()

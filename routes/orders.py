@@ -20,7 +20,10 @@ class OrderResources(Resource, OrderServices):
 
 class CheckoutOrderResource(Resource, OrderServices):
     def post(self):
-        pass
+        json_data = request.get_json()
+        service = self.checkout_order(json_data)
+
+        return service
 
 
 api.add_resource(OrderResources, "/api/v1/create-order", endpoint="create-order")
