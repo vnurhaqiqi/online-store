@@ -60,3 +60,57 @@ class PaymentServices(Responses):
             self.set_content(error)
 
             return self.get_response()
+
+    def confirm_payment_order(self, payment_id):
+        try:
+            payment = Payment.query.get(payment_id)
+
+            # check payment status
+            # besides confirmed will be processed
+            if payment.status == "confirmed":
+                self.set_status(400)
+                self.set_content("payment has been confirmed")
+
+                return self.get_response()
+
+            order = Order.query.get(payment.order_id)
+
+            # check order data
+            if not order:
+                self.set_status(404)
+                self.set_content("order not found")
+
+                return self.get_response()
+
+            # update payment and order data
+            # payment (status and updated_date)
+            # order (status and updated_date)
+            payment.status = "confirmed"
+            payment.updated_date = datetime.now()
+            order.status = "payment_confirmed"
+            order.updated_date = datetime.now()
+
+            db.session.commit()
+
+            payment_dict = {
+                "id": payment.id,
+                "order_id": payment.order_id,
+                "order_date": payment.order_date.strftime("%m-%d-%Y %H:%M:%S"),
+                "status": payment.status,
+                "payment_date": payment.payment_date.strftime("%m-%d-%Y %H:%M:%S"),
+                "amount": payment.amount
+            }
+
+            self.set_status(200)
+            self.set_content(payment_dict)
+
+            return self.get_response()
+
+
+        except SQLAlchemyError as e:
+            error = str(e.__dict__['orig'])
+
+            self.set_status(400)
+            self.set_content(error)
+
+            return self.get_response()

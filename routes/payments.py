@@ -12,5 +12,11 @@ class PaymentResources(Resource, PaymentServices):
 
         return service
 
+    def put(self, payment_id):
+        service = self.confirm_payment_order(payment_id)
+
+        return service
+
 
 api.add_resource(PaymentResources, "/api/v1/payment-order", endpoint="payment-order")
+api.add_resource(PaymentResources, "/api/v1/confirm-payment-order/<payment_id>", endpoint="confirm-payment-order")

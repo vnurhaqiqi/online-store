@@ -12,3 +12,6 @@ class Payment(db.Model):
     amount = db.Column(db.Float, nullable=False)
     created_date = db.Column(db.TIMESTAMP)
     updated_date = db.Column(db.TIMESTAMP)
+
+    def confirm_order(self):
+        self.status = "payment_confirmed"
