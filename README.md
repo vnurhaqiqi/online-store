@@ -6,6 +6,6 @@ Penyebab utama kenapa review jelek setelah event 12.12 terjadi adalah karena pel
 
 ### Propose Solution
 
-Untuk mencegah kejadian ini terjadi kembali, dibutuhkan pengecekan stock barang ketika customer hendak melakukan checkout dan payment. Serta pengecekan secara berkala untuk stock barang yang tersedia, sehingga department order processing dapat mengetahui update terakhir dari stock barang tersebut. Khususnya ketika mendekati event flash sale atau ketika event tersebut sedang berjalan.
+Untuk mencegah kejadian ini terjadi kembali, dibutuhkan pengecekan stock barang ketika customer hendak melakukan checkout. Serta pengecekan secara berkala untuk stock barang yang tersedia, sehingga department order processing dapat mengetahui update terakhir dari stock barang tersebut. Khususnya ketika mendekati event flash sale atau ketika event tersebut sedang berjalan.
 
 
