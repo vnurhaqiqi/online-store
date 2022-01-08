@@ -8,6 +8,9 @@ class Product(db.Model):
     name = db.Column(db.String(200), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
+    status = db.Column(db.Boolean, default=True)
+    most_lead_time = db.Column(db.Integer)
+    lead_time = db.Column(db.Integer)
 
     def check_available_quantity(self):
         status_dict = {}

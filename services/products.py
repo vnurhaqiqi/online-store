@@ -1,37 +1,9 @@
 from models.products import Product
 from helpers.responses import Responses
+from helpers.safety_stock import calculate_safety_stock
 from app import db
 
 from sqlalchemy.exc import SQLAlchemyError
-
-"""
-=== Product Services ===
-included transactions and logics to access products
-"""
-
-
-def order_get_product_by_id(product_id):
-    product = Product.query.get(product_id)
-
-    return product
-
-
-def check_product_available_quantity(product_id):
-    product = Product.query.get(product_id)
-    status_dict = {}
-
-    # if quantity is equal 0
-    # then it will give not_available status
-    if product.quantity <= 0:
-        status_dict["status"] = "not_available"
-        status_dict["available_quantity"] = product.quantity
-
-        return status_dict
-
-    status_dict["status"] = "available"
-    status_dict["available_quantity"] = product.quantity
-
-    return status_dict
 
 
 class ProductServices(Responses):
@@ -83,3 +55,17 @@ class ProductServices(Responses):
             self.set_content(error)
 
             return self.get_response()
+
+    def check_all_products_stock(self):
+        safety_stocks = calculate_safety_stock()
+
+        if not safety_stocks:
+            self.set_status(200)
+            self.set_content("no ordered products")
+
+            return self.get_response()
+
+        self.set_status(200)
+        self.set_content(safety_stocks)
+
+        return self.get_response()

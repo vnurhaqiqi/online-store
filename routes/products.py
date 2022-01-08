@@ -4,11 +4,6 @@ from app import api
 
 from services.products import ProductServices
 
-"""
-=== Product Routes ===
-all product routes are places here
-"""
-
 
 class ProductResource(Resource, ProductServices):
     def get(self):
@@ -23,5 +18,13 @@ class ProductResource(Resource, ProductServices):
         return service
 
 
+class CheckProductQuantityResources(Resource, ProductServices):
+    def get(self):
+        service = self.check_all_products_stock()
+
+        return service
+
+
 api.add_resource(ProductResource, "/api/v1/products", endpoint="get-all-products")
 api.add_resource(ProductResource, "/api/v1/products", endpoint="add-product")
+api.add_resource(CheckProductQuantityResources, "/api/v1/check-product-quantity", endpoint="check-product-quantity")
