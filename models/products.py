@@ -28,3 +28,6 @@ class Product(db.Model):
     def check_ordered_quantity(self, ordered_quantity):
         if ordered_quantity > self.quantity:
             return True
+
+    def add_product_quantity(self, quantity):
+        self.quantity = self.quantity + quantity
