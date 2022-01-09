@@ -106,7 +106,6 @@ class PaymentServices(Responses):
 
             return self.get_response()
 
-
         except SQLAlchemyError as e:
             error = str(e.__dict__['orig'])
 
