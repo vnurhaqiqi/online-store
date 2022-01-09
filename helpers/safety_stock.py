@@ -4,14 +4,10 @@ import calendar
 
 
 def calculate_safety_stock():
-    # get first day of month then formatted
-    get_first_day_of_month = datetime.today().replace(day=1)
-    first_day_of_month = datetime.strftime(get_first_day_of_month, "%Y-%m-%d 00:00:00")
-
-    # get last day of month then formatted
-    get_last_day_of_month = datetime.today().replace(
-        day=calendar.monthrange(datetime.today().year, datetime.today().month)[1])
-    last_day_of_month = datetime.strftime(get_last_day_of_month, "%Y-%m-%d 23:59:59")
+    # get current date time
+    today = datetime.today()
+    first_day_of_month = datetime.strftime(today, "%Y-%m-%d 00:00:00")
+    last_day_of_month = datetime.strftime(today, "%Y-%m-%d 23:59:59")
 
     """
         query to get ordered products current month
