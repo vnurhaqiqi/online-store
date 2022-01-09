@@ -25,7 +25,7 @@ class OrderServices(Responses):
         # calculate total order details amount
         # only order with available quantity will be calculated
         for detail in order_details:
-            if detail["product_status"]["status"] == "available":
+            if detail["product_availability"]["status"] == "available":
                 total_order_amount += detail["amount"]
 
         order_dict = {
@@ -131,10 +131,11 @@ class OrderServices(Responses):
                 order_details_list.append({
                     "id": detail.id,
                     "product_id": detail.product_id,
+                    "product_name": product.name,
                     "quantity": detail.quantity,
                     "price": detail.price,
                     "amount": total_amount,
-                    "product_status": status
+                    "product_availability": status
                 })
 
         return order_details_list
@@ -149,12 +150,15 @@ class OrderServices(Responses):
         db.session.add(order_detail)
         db.session.commit()
 
+        product = Product.query.get(payload["product_id"])
+
         total_amount = payload["quantity"] * payload["price"]
 
         order_detail_dict = {
             "id": order_detail.id,
             "order_id": order_detail.order_id,
-            "product_id": payload["product_id"],
+            "product_id": product.id,
+            "product_name": product.name,
             "quantity": order_detail.quantity,
             "price": order_detail.price,
             "amount": total_amount

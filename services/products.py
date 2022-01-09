@@ -17,12 +17,14 @@ class ProductServices(Responses):
 
         if products:
             for product in products:
-                product_list.append({
-                    "id": product.id,
-                    "name": product.name,
-                    "quantity": product.quantity,
-                    "price": product.price
-                })
+                if product.status:
+                    product_list.append({
+                        "id": product.id,
+                        "name": product.name,
+                        "quantity": product.quantity,
+                        "price": product.price,
+                        "status": product.status
+                    })
 
             self.set_status(200)
             self.set_content(product_list)
